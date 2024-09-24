@@ -103,6 +103,9 @@ server {
   listen 0.0.0.0:80;
 
   server_name "${virtualHost.hostnames.join('" "')}";
+  
+  access_log /dev/stdout;
+  error_log /dev/stderr;
 
   proxy_cache cache;
   proxy_cache_key "${cacheKey}";
@@ -136,13 +139,13 @@ ${vhostCacheNginx}
 
     ${authNginx}
 
-    error_page 404 =${defaultStatusCode} @fallback;
-    error_page 403 =${defaultStatusCode} @fallback;
+    # error_page 404 =${defaultStatusCode} @fallback;
+    # error_page 403 =${defaultStatusCode} @fallback;
 
     proxy_set_header       Content-Type  "";
-    proxy_set_header       Host          "${virtualHost.bucket}.${upstream}";
     proxy_intercept_errors on;
     proxy_pass             "https://${upstream}$uri_path";
+    proxy_ssl_server_name on;
 
     ${virtualHost.forceImageMimeType ? 'proxy_hide_header Content-Type;' : ''}
 
